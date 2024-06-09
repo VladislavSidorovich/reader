@@ -296,8 +296,8 @@ App.prototype.onTocItemClick = function (href, event) {
 App.prototype.onRenditionRelocated = function (event) {
     try {this.doDictionary(null);} catch (err) {}
     try {
-        let navItem = this.getNavItem(event, false) || this.getNavItem(event, true);
-        console.log(navItem)
+     //   let navItem = this.getNavItem(event, false) || this.getNavItem(event, true);
+     //   console.log(navItem)
        // this.qsa(".toc-list .item").forEach(el => el.classList[(navItem && el.dataset.href == navItem.href) ? "add" : "remove"]("active"));
     } catch (err) {
         this.fatal("error updating toc", err);
