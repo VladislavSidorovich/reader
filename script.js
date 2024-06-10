@@ -166,14 +166,19 @@ App.prototype.doBook = function (url, opts) {
             }
         });
 
-        // Try to change href of the link element with retries
+        // Изменение href у ссылки, содержащей текст "1"
         const changeLinkHref = () => {
-            const linkElement = document.getElementById("back_note_1");
-            if (linkElement) {
-                linkElement.href = "https://github.com/VladislavSidorovich/reader/blob/main/script.js";
-                console.log("Link href updated");
-            } else {
-                console.error("Link with id 'back_note_1' not found, retrying...");
+            const links = document.querySelectorAll("a");
+            let linkFound = false;
+            links.forEach(link => {
+                if (link.textContent.trim() === "1") {
+                    link.href = "https://github.com/VladislavSidorovich/reader/blob/main/script.js";
+                    linkFound = true;
+                    console.log("Link href updated");
+                }
+            });
+            if (!linkFound) {
+                console.error("Link with text '1' not found, retrying...");
                 setTimeout(changeLinkHref, 1000);  // Retry after 1 second
             }
         };
