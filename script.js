@@ -39,11 +39,15 @@ let App = function (el) {
 
     this.qsa(".tab-list .item").forEach(el => el.addEventListener("click", this.onTabClick.bind(this, el.dataset.tab)));
     this.qs(".sidebar .search-bar .search-box").addEventListener("keydown", event => {
-        if (event.keyCode === 13) this.qs(".sidebar .search-bar .search-button").click();
+        if (event.keyCode == 13) this.qs(".sidebar .search-bar .search-button").click();
     });
     this.qs(".sidebar .search-bar .search-button").addEventListener("click", this.onSearchClick.bind(this));
     this.qs(".sidebar-wrapper").addEventListener("click", event => {
-        if (event.target.classList.contains("sidebar-wrapper")) event.target.classList.add("out");
+        try {
+            if (event.target.classList.contains("sidebar-wrapper")) event.target.classList.add("out");
+        } catch (err) {
+            this.fatal("error hiding sidebar", err);
+        }
     });
     this.qsa(".chips[data-chips]").forEach(el => {
         Array.from(el.querySelectorAll(".chip[data-value]")).forEach(cel => cel.addEventListener("click", event => {
@@ -52,30 +56,42 @@ let App = function (el) {
     });
     this.qs("button.prev").addEventListener("click", () => this.state.rendition.prev());
     this.qs("button.next").addEventListener("click", () => this.state.rendition.next());
-    this.doOpenBook();
+    this.doOpenBook()
 
-    this.qs(".bar .loc").style.cursor = "pointer";
-    this.qs(".bar .loc").addEventListener("click", event => {
-        let answer = prompt(`Location to go to (up to ${this.state.book.locations.length()})?`, this.state.rendition.currentLocation().start.location);
-        if (!answer) return;
+    try {
+        this.qs(".bar .loc").style.cursor = "pointer";
+        this.qs(".bar .loc").addEventListener("click", event => {
+            try {
+                let answer = prompt(`Location to go to (up to ${this.state.book.locations.length()})?`, this.state.rendition.currentLocation().start.location);
+                if (!answer) return;
+                answer = answer.trim();
+                if (answer == "") return;
 
-        let parsed = parseInt(answer.trim(), 10);
-        if (isNaN(parsed) || parsed < 0 || parsed > this.state.book.locations.length()) {
-            alert("Invalid location");
-            return;
-        }
+                let parsed = parseInt(answer, 10);
+                if (isNaN(parsed) || parsed < 0) throw new Error("Invalid location: not a positive integer");
+                if (parsed > this.state.book.locations.length()) throw new Error("Invalid location");
 
-        let cfi = this.state.book.locations.cfiFromLocation(parsed);
-        if (cfi !== -1) {
-            this.state.rendition.display(cfi);
-        } else {
-            alert("Invalid location");
-        }
-    });
+                let cfi = this.state.book.locations.cfiFromLocation(parsed);
+                if (cfi === -1) throw new Error("Invalid location");
+
+                this.state.rendition.display(cfi);
+            } catch (err) {
+                alert(err.toString());
+            }
+        });
+    } catch (err) {
+        this.fatal("error attaching event handlers for location go to", err);
+        throw err;
+    }
 
     this.doTab("toc");
 
-    this.loadSettingsFromStorage();
+    try {
+        this.loadSettingsFromStorage();
+    } catch (err) {
+        this.fatal("error loading settings", err);
+        throw err;
+    }
     this.applyTheme();
 };
 
@@ -85,7 +101,7 @@ App.prototype.doBook = function (url, opts) {
     opts = opts || {
         encoding: "epub"
     };
-    //console.log("doBook", url, opts);
+    console.log("doBook", url, opts);
     this.doReset();
 
     try {
@@ -120,6 +136,16 @@ App.prototype.doBook = function (url, opts) {
     if (this.state.dictInterval) window.clearInterval(this.state.dictInterval);
     this.state.dictInterval = window.setInterval(this.checkDictionary.bind(this), 50);
     this.doDictionary(null);
+
+
+    this.state.book.ready.then(() => {
+        console.log("Book is ready");
+        return this.state.book.locations.generate(1600);
+    }).then(locations => {
+        console.log("Total pages:", this.state.book.locations.length());
+    }).catch(error => {
+        this.fatal("failed to load book", error.message);
+    });
 };
 
 App.prototype.loadSettingsFromStorage = function () {
@@ -725,93 +751,3 @@ App.prototype.onNavigationLoaded = function (nav) {
 };
 
 */
-
-
-
-
-App.prototype.loadBook = function (arrayBuffer, options) {
-    this.state.book = ePub(arrayBuffer, options);
-    this.state.rendition = this.state.book.renderTo("viewer", { width: "100%", height: "100%" });
-
-    this.state.book.ready.then(() => {
-        console.log("Book is ready");
-        return this.state.book.loaded.navigation;
-    }).then(navigation => {
-        this.createTOC(navigation);
-        this.createPageNavigation(navigation);
-    }).catch(error => {
-        this.fatal("failed to load navigation", error.message);
-    });
-};
-
-App.prototype.createTOC = function (navigation) {
-    const tocList = this.qs(".toc-list");
-    navigation.toc.forEach(chapter => {
-        const chapterLink = document.createElement("a");
-        chapterLink.href = chapter.href;
-        chapterLink.textContent = chapter.label;
-        chapterLink.addEventListener("click", event => {
-            event.preventDefault();
-            this.state.rendition.display(chapter.href);
-        });
-        tocList.appendChild(chapterLink);
-    });
-};
-
-App.prototype.createPageNavigation = function (navigation) {
-    const pageNavigationDropdown = this.qs("#page-navigation-dropdown");
-    navigation.toc.forEach((chapter, index) => {
-        const option = document.createElement("option");
-        option.value = chapter.href;
-        option.textContent = `Page ${index + 1}: ${chapter.label}`;
-        pageNavigationDropdown.appendChild(option);
-    });
-
-    pageNavigationDropdown.addEventListener("change", event => {
-        const href = event.target.value;
-        this.state.rendition.display(href);
-    });
-};
-
-App.prototype.fatal = function (message, error) {
-    console.error(message, error);
-    alert(`${message}: ${error}`);
-};
-
-App.prototype.doTab = function (tabName) {
-    // Your tab logic here
-};
-
-App.prototype.loadSettingsFromStorage = function () {
-    // Your settings loading logic here
-};
-
-App.prototype.applyTheme = function () {
-    // Your theme application logic here
-};
-
-
-document.addEventListener("DOMContentLoaded", () => {
-    if (document.querySelector("#viewer")) {
-        new App(document.querySelector("#viewer"));
-    } else {
-        console.error("Viewer element not found");
-    }
-});
-
-
-App.prototype.qs = function (selector) {
-    const element = document.querySelector(selector);
-    if (!element) {
-        console.error(`Element not found for selector: ${selector}`);
-    }
-    return element;
-};
-
-App.prototype.qsa = function (selector) {
-    const elements = document.querySelectorAll(selector);
-    if (elements.length === 0) {
-        console.error(`Elements not found for selector: ${selector}`);
-    }
-    return elements;
-};
