@@ -138,11 +138,11 @@ App.prototype.doBook = function (url, opts) {
     this.doDictionary(null);
 
 
-    book.ready.then(() => {
+    this.state.book.ready.then(() => {
         console.log("Book is ready");
-        return book.locations.generate(1600);
+        return this.state.book.locations.generate(1600);
     }).then(locations => {
-        const totalPages = book.locations.length();
+        const totalPages = this.state.book.locations.length();
         console.log("Total pages:", totalPages);
 
         // Populate the select element with page numbers
