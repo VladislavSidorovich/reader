@@ -166,11 +166,17 @@ App.prototype.doBook = function (url, opts) {
         // Hook to log all links and update the first link when content is loaded
         this.state.rendition.hooks.content.register(contents => {
             const links = contents.document.querySelectorAll("a");
-            const newHref = "https://github.com/VladislavSidorovich/reader"; // Замените на нужную вам ссылку
+            const newHref = "https://example.com"; // Замените на нужную вам ссылку
 
             if (links.length > 0) {
                 links[0].href = newHref; // Изменяем первую найденную ссылку
                 console.log("Updated first link to:", links[0].href);
+
+                // Добавляем обработчик события click на первую ссылку
+                links[0].addEventListener("click", (event) => {
+                    event.preventDefault(); // Предотвращаем поведение по умолчанию
+                    window.location.href = newHref; // Перенаправляем на новую ссылку
+                });
             }
         });
 
