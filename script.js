@@ -666,6 +666,8 @@ App.prototype.onSearchClick = function (event) {
     }).catch(err => this.fatal("error searching book", err));
 };
 
+
+
 App.prototype.doSidebar = function () {
     this.qs(".sidebar-wrapper").classList.toggle('out');
 };
@@ -699,6 +701,8 @@ try {
         if (!isRavenDisabled) Raven.captureException(err);
     } catch (err) {}
 }
+
+
 /*
 App.prototype.getNavItem = function(loc, ignoreHash) {
     return (function flatten(arr) {
@@ -728,5 +732,12 @@ App.prototype.onNavigationLoaded = function (nav) {
     handleItems(nav.toc, 0);
 };
 
-
 */
+
+const source = document.querySelector("p");
+
+source.addEventListener("copy", (event) => {
+  const selection = document.getSelection();
+  event.clipboardData.setData("text/plain", selection.toString().toUpperCase());
+  event.preventDefault();
+});
