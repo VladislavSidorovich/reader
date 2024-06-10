@@ -741,3 +741,86 @@ App.prototype.onNavigationLoaded = function (nav) {
 };
 
 */
+
+
+
+
+App.prototype.init = function () {
+    this.loadBook(this.bookUrl);
+};
+
+App.prototype.loadBook = function (bookUrl) {
+    this.book = ePub(bookUrl);
+    this.rendition = this.book.renderTo("viewer", { width: "100%", height: "100%" });
+
+    this.book.ready.then(() => {
+        console.log("Book is ready");
+        return this.book.loaded.navigation;
+    }).then(nav => {
+        console.log("Navigation is loaded", nav);
+        this.onNavigationLoaded(nav);
+    }).catch(err => {
+        console.error("Error loading book or navigation", err);
+    });
+};
+
+App.prototype.qs = function (selector) {
+    return document.querySelector(selector);
+};
+
+App.prototype.el = function (tag, className) {
+    var element = document.createElement(tag);
+    if (className) {
+        element.className = className;
+    }
+    return element;
+};
+
+App.prototype.onNavigationLoaded = function (nav) {
+    let toc = this.qs(".toc-list");
+    toc.innerHTML = "";
+
+    // Функция для обработки элементов навигации
+    let handleItems = (items, indent) => {
+        items.forEach(item => {
+            let a = toc.appendChild(this.el("a", "item"));
+            a.href = item.href;
+            a.dataset.href = item.href;
+            a.innerHTML = `${"&nbsp;".repeat(indent * 4)}${item.label.trim()}`;
+            a.addEventListener("click", this.onTocItemClick.bind(this, item.href));
+            
+            // Рекурсивно обрабатываем подэлементы
+            if (item.subitems && item.subitems.length > 0) {
+                handleItems(item.subitems, indent + 1);
+            }
+        });
+    };
+
+    // Функция для обработки страниц
+    let handlePages = (pages) => {
+        let dropdown = this.qs("#page-navigation-dropdown");
+        dropdown.innerHTML = '<option disabled selected>Select a page</option>'; // Сбрасываем содержимое
+
+        pages.forEach((page, index) => {
+            let option = document.createElement("option");
+            option.value = page.href;
+            option.textContent = `Page ${index + 1}`;
+            dropdown.appendChild(option);
+        });
+
+        dropdown.addEventListener("change", (event) => {
+            let href = event.target.value;
+            this.book.rendition.display(href);
+        });
+    };
+
+    // Обработка элементов навигации
+    handleItems(nav.toc, 0);
+
+   
+};
+
+App.prototype.onTocItemClick = function (href, event) {
+    event.preventDefault();
+    this.rendition.display(href);
+};
