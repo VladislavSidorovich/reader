@@ -39,15 +39,11 @@ let App = function (el) {
 
     this.qsa(".tab-list .item").forEach(el => el.addEventListener("click", this.onTabClick.bind(this, el.dataset.tab)));
     this.qs(".sidebar .search-bar .search-box").addEventListener("keydown", event => {
-        if (event.keyCode == 13) this.qs(".sidebar .search-bar .search-button").click();
+        if (event.keyCode === 13) this.qs(".sidebar .search-bar .search-button").click();
     });
     this.qs(".sidebar .search-bar .search-button").addEventListener("click", this.onSearchClick.bind(this));
     this.qs(".sidebar-wrapper").addEventListener("click", event => {
-        try {
-            if (event.target.classList.contains("sidebar-wrapper")) event.target.classList.add("out");
-        } catch (err) {
-            this.fatal("error hiding sidebar", err);
-        }
+        if (event.target.classList.contains("sidebar-wrapper")) event.target.classList.add("out");
     });
     this.qsa(".chips[data-chips]").forEach(el => {
         Array.from(el.querySelectorAll(".chip[data-value]")).forEach(cel => cel.addEventListener("click", event => {
@@ -56,42 +52,30 @@ let App = function (el) {
     });
     this.qs("button.prev").addEventListener("click", () => this.state.rendition.prev());
     this.qs("button.next").addEventListener("click", () => this.state.rendition.next());
-    this.doOpenBook()
+    this.doOpenBook();
 
-    try {
-        this.qs(".bar .loc").style.cursor = "pointer";
-        this.qs(".bar .loc").addEventListener("click", event => {
-            try {
-                let answer = prompt(`Location to go to (up to ${this.state.book.locations.length()})?`, this.state.rendition.currentLocation().start.location);
-                if (!answer) return;
-                answer = answer.trim();
-                if (answer == "") return;
+    this.qs(".bar .loc").style.cursor = "pointer";
+    this.qs(".bar .loc").addEventListener("click", event => {
+        let answer = prompt(`Location to go to (up to ${this.state.book.locations.length()})?`, this.state.rendition.currentLocation().start.location);
+        if (!answer) return;
 
-                let parsed = parseInt(answer, 10);
-                if (isNaN(parsed) || parsed < 0) throw new Error("Invalid location: not a positive integer");
-                if (parsed > this.state.book.locations.length()) throw new Error("Invalid location");
+        let parsed = parseInt(answer.trim(), 10);
+        if (isNaN(parsed) || parsed < 0 || parsed > this.state.book.locations.length()) {
+            alert("Invalid location");
+            return;
+        }
 
-                let cfi = this.state.book.locations.cfiFromLocation(parsed);
-                if (cfi === -1) throw new Error("Invalid location");
-
-                this.state.rendition.display(cfi);
-            } catch (err) {
-                alert(err.toString());
-            }
-        });
-    } catch (err) {
-        this.fatal("error attaching event handlers for location go to", err);
-        throw err;
-    }
+        let cfi = this.state.book.locations.cfiFromLocation(parsed);
+        if (cfi !== -1) {
+            this.state.rendition.display(cfi);
+        } else {
+            alert("Invalid location");
+        }
+    });
 
     this.doTab("toc");
 
-    try {
-        this.loadSettingsFromStorage();
-    } catch (err) {
-        this.fatal("error loading settings", err);
-        throw err;
-    }
+    this.loadSettingsFromStorage();
     this.applyTheme();
 };
 
@@ -745,82 +729,68 @@ App.prototype.onNavigationLoaded = function (nav) {
 
 
 
-App.prototype.init = function () {
-    this.loadBook(this.bookUrl);
-};
+App.prototype.loadBook = function (arrayBuffer, options) {
+    this.state.book = ePub(arrayBuffer, options);
+    this.state.rendition = this.state.book.renderTo("viewer", { width: "100%", height: "100%" });
 
-App.prototype.loadBook = function (bookUrl) {
-    this.book = ePub(bookUrl);
-    this.rendition = this.book.renderTo("viewer", { width: "100%", height: "100%" });
-
-    this.book.ready.then(() => {
+    this.state.book.ready.then(() => {
         console.log("Book is ready");
-        return this.book.loaded.navigation;
-    }).then(nav => {
-        console.log("Navigation is loaded", nav);
-        this.onNavigationLoaded(nav);
-    }).catch(err => {
-        console.error("Error loading book or navigation", err);
+        return this.state.book.loaded.navigation;
+    }).then(navigation => {
+        this.createTOC(navigation);
+        this.createPageNavigation(navigation);
+    }).catch(error => {
+        this.fatal("failed to load navigation", error.message);
     });
 };
 
-App.prototype.qs = function (selector) {
-    return document.querySelector(selector);
-};
-
-App.prototype.el = function (tag, className) {
-    var element = document.createElement(tag);
-    if (className) {
-        element.className = className;
-    }
-    return element;
-};
-
-App.prototype.onNavigationLoaded = function (nav) {
-    let toc = this.qs(".toc-list");
-    toc.innerHTML = "";
-
-    // Функция для обработки элементов навигации
-    let handleItems = (items, indent) => {
-        items.forEach(item => {
-            let a = toc.appendChild(this.el("a", "item"));
-            a.href = item.href;
-            a.dataset.href = item.href;
-            a.innerHTML = `${"&nbsp;".repeat(indent * 4)}${item.label.trim()}`;
-            a.addEventListener("click", this.onTocItemClick.bind(this, item.href));
-            
-            // Рекурсивно обрабатываем подэлементы
-            if (item.subitems && item.subitems.length > 0) {
-                handleItems(item.subitems, indent + 1);
-            }
+App.prototype.createTOC = function (navigation) {
+    const tocList = this.qs(".toc-list");
+    navigation.toc.forEach(chapter => {
+        const chapterLink = document.createElement("a");
+        chapterLink.href = chapter.href;
+        chapterLink.textContent = chapter.label;
+        chapterLink.addEventListener("click", event => {
+            event.preventDefault();
+            this.state.rendition.display(chapter.href);
         });
-    };
-
-    // Функция для обработки страниц
-    let handlePages = (pages) => {
-        let dropdown = this.qs("#page-navigation-dropdown");
-        dropdown.innerHTML = '<option disabled selected>Select a page</option>'; // Сбрасываем содержимое
-
-        pages.forEach((page, index) => {
-            let option = document.createElement("option");
-            option.value = page.href;
-            option.textContent = `Page ${index + 1}`;
-            dropdown.appendChild(option);
-        });
-
-        dropdown.addEventListener("change", (event) => {
-            let href = event.target.value;
-            this.book.rendition.display(href);
-        });
-    };
-
-    // Обработка элементов навигации
-    handleItems(nav.toc, 0);
-
-   
+        tocList.appendChild(chapterLink);
+    });
 };
 
-App.prototype.onTocItemClick = function (href, event) {
-    event.preventDefault();
-    this.rendition.display(href);
+App.prototype.createPageNavigation = function (navigation) {
+    const pageNavigationDropdown = this.qs("#page-navigation-dropdown");
+    navigation.toc.forEach((chapter, index) => {
+        const option = document.createElement("option");
+        option.value = chapter.href;
+        option.textContent = `Page ${index + 1}: ${chapter.label}`;
+        pageNavigationDropdown.appendChild(option);
+    });
+
+    pageNavigationDropdown.addEventListener("change", event => {
+        const href = event.target.value;
+        this.state.rendition.display(href);
+    });
 };
+
+App.prototype.fatal = function (message, error) {
+    console.error(message, error);
+    alert(`${message}: ${error}`);
+};
+
+App.prototype.doTab = function (tabName) {
+    // Your tab logic here
+};
+
+App.prototype.loadSettingsFromStorage = function () {
+    // Your settings loading logic here
+};
+
+App.prototype.applyTheme = function () {
+    // Your theme application logic here
+};
+
+// Initialize the App
+document.addEventListener("DOMContentLoaded", () => {
+    new App(document.querySelector("#viewer"));
+});
