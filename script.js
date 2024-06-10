@@ -138,20 +138,33 @@ App.prototype.doBook = function (url, opts) {
     this.doDictionary(null);
 
 
-    this.state.book.ready.then(() => {
+    book.ready.then(() => {
         console.log("Book is ready");
-        return this.state.book.locations.generate(1600);
+        return book.locations.generate(1600);
     }).then(locations => {
-        console.log("Total pages:", this.state.book.locations.length());
-        // Переход на третью страницу
-        const cfi = this.state.book.locations.cfiFromLocation(3);
-        if (cfi !== -1) {
-            this.state.rendition.display(cfi);
-        } else {
-            console.error("Invalid page number");
+        const totalPages = book.locations.length();
+        console.log("Total pages:", totalPages);
+
+        // Populate the select element with page numbers
+        for (let i = 1; i <= totalPages; i++) {
+            const option = document.createElement("option");
+            option.value = i;
+            option.textContent = `Page ${i}`;
+            selectElement.appendChild(option);
         }
+
+        // Add event listener for page selection
+        selectElement.addEventListener("change", function (event) {
+            const pageNumber = parseInt(event.target.value, 10);
+            const cfi = book.locations.cfiFromLocation(pageNumber);
+            if (cfi !== -1) {
+                rendition.display(cfi);
+            } else {
+                console.error("Invalid page number");
+            }
+        });
     }).catch(error => {
-        this.fatal("failed to load book", error.message);
+        console.error("Failed to load book", error.message);
     });
 };
 
