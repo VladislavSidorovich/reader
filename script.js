@@ -773,3 +773,19 @@ App.prototype.onNavigationLoaded = function (nav) {
 };
 
 */
+
+document.getElementById("chapter3-btn").addEventListener("click", function() {
+    app.goToChapter("глава 3");
+});
+
+// Метод для поиска и перехода к указанной главе
+App.prototype.goToChapter = function(chapterName) {
+    this.doSearch(chapterName).then(results => {
+        if (results.length > 0) {
+            let firstResult = results[0];
+            this.state.book.rendition.display(firstResult.cfi);
+        } else {
+            alert("Глава не найдена.");
+        }
+    }).catch(err => this.fatal("error searching for chapter", err));
+};
