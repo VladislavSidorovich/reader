@@ -157,7 +157,7 @@ App.prototype.doBook = function (url, opts) {
         // Add event listener for page selection
         selectElement.addEventListener("change", function (event) {
             const pageNumber = parseInt(event.target.value, 10);
-            const cfi = book.locations.cfiFromLocation(pageNumber);
+            const cfi = this.state.book.locations.cfiFromLocation(pageNumber);
             if (cfi !== -1) {
                 rendition.display(cfi);
             } else {
