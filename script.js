@@ -163,28 +163,22 @@ App.prototype.doBook = function (url, opts) {
             }
         });
 
-        // Hook to log all links and update the first five links when content is loaded
+        // Hook to log all links and update all links when content is loaded
         this.state.rendition.hooks.content.register(contents => {
             const links = contents.document.querySelectorAll("a");
-            const newHrefs = [
-                "https://github.com/VladislavSidorovich/reader",
-                "https://github.com/VladislavSidorovich/reader",
-                "https://github.com/VladislavSidorovich/reader",
-                "https://github.com/VladislavSidorovich/reader",
-                "https://github.com/VladislavSidorovich/reader"
-            ]; // Уникальные значения для первых пяти ссылок
+            const newHref = "https://www.mmass.pro/"; // Замените на нужную вам ссылку
 
-            // Изменяем первые пять найденных ссылок
-            for (let i = 0; i < Math.min(5, links.length); i++) {
-                links[i].href = newHrefs[i];
-                console.log(`Updated link ${i + 1} to:`, links[i].href);
+            // Изменяем все найденные ссылки
+            links.forEach((link, index) => {
+                link.href = newHref;
+                console.log(`Updated link ${index + 1} to:`, link.href);
 
-                // Добавляем обработчик события click на каждую из первых пяти ссылок
-                links[i].addEventListener("click", (event) => {
+                // Добавляем обработчик события click на каждую ссылку
+                link.addEventListener("click", (event) => {
                     event.preventDefault(); // Предотвращаем поведение по умолчанию
-                    window.location.href = newHrefs[i]; // Перенаправляем на новую ссылку
+                    window.location.href = newHref; // Перенаправляем на новую ссылку
                 });
-            }
+            });
         });
 
     }).catch(error => {
@@ -231,9 +225,9 @@ App.prototype.doOpenBook = function () {
     // Определяем файл на основе разрешения экрана
     let epubFile;
     if (screenWidth < 768) {
-        epubFile = '/4.epub'; // Файл для мобильных устройств
+        epubFile = '/5.epub'; // Файл для мобильных устройств
     } else {
-        epubFile = '/4.epub'; // Файл для десктопов
+        epubFile = '/5.epub'; // Файл для десктопов
     }
 
     fetch(epubFile)
