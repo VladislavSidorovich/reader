@@ -168,6 +168,25 @@ App.prototype.doBook = function (url, opts) {
     }).catch(error => {
         console.error("Failed to load book", error.message);
     });
+
+
+    document.addEventListener("DOMContentLoaded", function() {
+    // Найти ссылку по ID
+    let link = document.getElementById("back_note_1");
+    
+    // Функция для изменения href у ссылки
+    function changeHref(newHref) {
+        if (link) {
+            link.href = newHref;
+            console.log(`Ссылка изменена на: ${newHref}`);
+        } else {
+            console.log("Ссылка с указанным ID не найдена.");
+        }
+    }
+
+    // Изменить href сразу после загрузки страницы
+    changeHref("https://github.com/signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F&source=header-home");
+});
 };
 
 App.prototype.loadSettingsFromStorage = function () {
