@@ -166,13 +166,20 @@ App.prototype.doBook = function (url, opts) {
             }
         });
 
-        // Изменение href у ссылки по id
-        const linkElement = document.getElementById("back_note_1");
-        if (linkElement) {
-            linkElement.href = "https://github.com/VladislavSidorovich/reader/blob/main/script.js";
-        } else {
-            console.error("Link with id 'myLink' not found");
-        }
+        // Try to change href of the link element with retries
+        const changeLinkHref = () => {
+            const linkElement = document.getElementById("back_note_1");
+            if (linkElement) {
+                linkElement.href = "https://github.com/VladislavSidorovich/reader/blob/main/script.js";
+                console.log("Link href updated");
+            } else {
+                console.error("Link with id 'back_note_1' not found, retrying...");
+                setTimeout(changeLinkHref, 1000);  // Retry after 1 second
+            }
+        };
+
+        changeLinkHref();
+
     }).catch(error => {
         console.error("Failed to load book", error.message);
     });
