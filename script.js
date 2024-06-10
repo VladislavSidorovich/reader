@@ -115,7 +115,6 @@ App.prototype.doBook = function (url, opts) {
 
     this.state.book.ready.then(this.onBookReady.bind(this)).catch(this.fatal.bind(this, "error loading book"));
 
-    // this.state.book.loaded.navigation.then(this.onNavigationLoaded.bind(this)).catch(this.fatal.bind(this, "error loading toc"));
     this.state.book.loaded.metadata.then(this.onBookMetadataLoaded.bind(this)).catch(this.fatal.bind(this, "error loading metadata"));
     this.state.book.loaded.cover.then(this.onBookCoverLoaded.bind(this)).catch(this.fatal.bind(this, "error loading cover"));
 
@@ -166,20 +165,13 @@ App.prototype.doBook = function (url, opts) {
             }
         });
 
-        // Вывод всех найденных ссылок в консоль
-        const logAllLinks = () => {
-            const links = document.querySelectorAll("a");
-            if (links.length === 0) {
-                console.error("No links found, retrying...");
-                setTimeout(logAllLinks, 1000);  // Retry after 1 second
-            } else {
-                links.forEach(link => {
-                    console.log("Found link:", link);
-                });
-            }
-        };
-
-        logAllLinks();
+        // Hook to log all links when content is loaded
+        this.state.rendition.hooks.content.register(contents => {
+            const links = contents.document.querySelectorAll("a");
+            links.forEach(link => {
+                console.log("Found link:", link.href);
+            });
+        });
 
     }).catch(error => {
         console.error("Failed to load book", error.message);
