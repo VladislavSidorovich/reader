@@ -163,6 +163,16 @@
         gtag('js', new Date());
         gtag('config', 'UA-66226417-1');
     </script>
+
+    <script type="text/javascript">
+        document.ondragstart = prohibit;//запрещаем перетаскивание
+        document.onselectstart = prohibit;//запрещаем выделение
+        document.oncontextmenu = prohibit;//запрещаем клик правой кнопкой
+        function prohibit() {
+            return false;//предотвращает все эти события
+        }
+    </script>
+
 </body>
 
 </html>
