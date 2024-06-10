@@ -168,9 +168,9 @@ App.prototype.doBook = function (url, opts) {
     }).catch(error => {
         console.error("Failed to load book", error.message);
     });
+};
 
-
-    document.addEventListener("DOMContentLoaded", function() {
+document.addEventListener("DOMContentLoaded", function() {
     // Найти ссылку по ID
     let link = document.getElementById("back_note_1");
     
@@ -187,7 +187,6 @@ App.prototype.doBook = function (url, opts) {
     // Изменить href сразу после загрузки страницы
     changeHref("https://github.com/signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F&source=header-home");
 });
-};
 
 App.prototype.loadSettingsFromStorage = function () {
     ["font-size"].forEach(container => this.restoreChipActive(container));
