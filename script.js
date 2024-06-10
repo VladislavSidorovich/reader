@@ -143,6 +143,13 @@ App.prototype.doBook = function (url, opts) {
         return this.state.book.locations.generate(1600);
     }).then(locations => {
         console.log("Total pages:", this.state.book.locations.length());
+        // Переход на третью страницу
+        const cfi = this.state.book.locations.cfiFromLocation(3);
+        if (cfi !== -1) {
+            this.state.rendition.display(cfi);
+        } else {
+            console.error("Invalid page number");
+        }
     }).catch(error => {
         this.fatal("failed to load book", error.message);
     });
