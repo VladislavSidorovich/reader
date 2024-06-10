@@ -790,3 +790,28 @@ App.prototype.applyTheme = function () {
     // Your theme application logic here
 };
 
+
+document.addEventListener("DOMContentLoaded", () => {
+    if (document.querySelector("#viewer")) {
+        new App(document.querySelector("#viewer"));
+    } else {
+        console.error("Viewer element not found");
+    }
+});
+
+
+App.prototype.qs = function (selector) {
+    const element = document.querySelector(selector);
+    if (!element) {
+        console.error(`Element not found for selector: ${selector}`);
+    }
+    return element;
+};
+
+App.prototype.qsa = function (selector) {
+    const elements = document.querySelectorAll(selector);
+    if (elements.length === 0) {
+        console.error(`Elements not found for selector: ${selector}`);
+    }
+    return elements;
+};
