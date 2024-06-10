@@ -181,13 +181,6 @@ App.prototype.doOpenBook = function () {
         epubFile = '/1.epub'; // Файл для десктопов
     }
 
-    document.ondragstart = prohibit;//запрещаем перетаскивание
-    document.onselectstart = prohibit;//запрещаем выделение
-    document.oncontextmenu = prohibit;//запрещаем клик правой кнопкой
-    function prohibit() {
-        return false;//предотвращает все эти события
-    }
-
     fetch(epubFile)
         .then(response => {
             if (!response.ok) {
@@ -424,7 +417,11 @@ App.prototype.applyTheme = function () {
             "line-height": `${theme.lh} !important`,
             "text-align": `${theme.ta} !important`,
             "padding-top": theme.m,
-            "padding-bottom": theme.m
+            "padding-bottom": theme.m,
+            "-webkit-user-select":"none",
+            "-moz-user-select": "none",
+            "-ms-user-select": "none",
+            "user-select": "none"
         },
         "p": {
             "font-family": '"GillSans-Light" !important',
@@ -470,6 +467,10 @@ App.prototype.applyTheme = function () {
         ".block_2 img": {
             "display": "none !important;"
         },
+        "::selection": {
+            "background": "none"
+        }
+
     };
 
     try {
