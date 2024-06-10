@@ -775,7 +775,7 @@ App.prototype.onNavigationLoaded = function (nav) {
 */
 
 document.getElementById("chapter3-btn").addEventListener("click", function() {
-    app.goToChapter("глава 3");
+    App.goToChapter("глава 3");
 });
 
 // Метод для поиска и перехода к указанной главе
