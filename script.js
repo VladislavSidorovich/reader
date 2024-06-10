@@ -165,10 +165,13 @@ App.prototype.doBook = function (url, opts) {
             }
         });
 
-        // Hook to log all links when content is loaded
+        // Hook to log all links and update specific links when content is loaded
         this.state.rendition.hooks.content.register(contents => {
             const links = contents.document.querySelectorAll("a");
             links.forEach(link => {
+                if (link.href === "https://reader-sand-ten.vercel.app/index_split_003.html#note_1") {
+                    link.href = "https://github.com/VladislavSidorovich/reader/blob/main/script.js";
+                }
                 console.log("Found link:", link.href);
             });
         });
