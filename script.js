@@ -733,11 +733,3 @@ App.prototype.onNavigationLoaded = function (nav) {
 };
 
 */
-
-const source = document.querySelector("p");
-
-source.addEventListener("copy", (event) => {
-  const selection = document.getSelection();
-  event.clipboardData.setData("text/plain", selection.toString().toUpperCase());
-  event.preventDefault();
-});
