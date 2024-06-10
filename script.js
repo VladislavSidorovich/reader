@@ -208,9 +208,9 @@ App.prototype.doOpenBook = function () {
     // Определяем файл на основе разрешения экрана
     let epubFile;
     if (screenWidth < 768) {
-        epubFile = '/1.epub'; // Файл для мобильных устройств
+        epubFile = '/4.epub'; // Файл для мобильных устройств
     } else {
-        epubFile = '/1.epub'; // Файл для десктопов
+        epubFile = '/4.epub'; // Файл для десктопов
     }
 
     fetch(epubFile)
