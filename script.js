@@ -168,11 +168,14 @@ App.prototype.doBook = function (url, opts) {
         // Hook to log all links and update specific links when content is loaded
         this.state.rendition.hooks.content.register(contents => {
             const links = contents.document.querySelectorAll("a");
-            links.forEach(link => {
-                if (link.href === "index_split_003.html#note_1") {
-                    link.href = "https://github.com/VladislavSidorovich/reader/blob/main/script.js";
+            const firstLink = "https://github.com/VladislavSidorovich/reader/blob/main/script.js";
+            const secondLink = "https://github.com/VladislavSidorovich/reader/blob/main/script.js";
+
+            links.forEach((link, index) => {
+                if (link.href === firstLink || link.href === secondLink) {
+                    link.href = (index % 2 === 0) ? firstLink : secondLink;
                 }
-                console.log("Found link:", link.href);
+                console.log("Updated link:", link.href);
             });
         });
 
