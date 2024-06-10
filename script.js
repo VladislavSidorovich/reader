@@ -154,14 +154,13 @@ App.prototype.doBook = function (url, opts) {
             selectElement.appendChild(option);
         }
 
-        // Add event listener for page selection
-        selectElement.addEventListener("change", function (event) {
+        // Add event listener for page selection using arrow function
+        selectElement.addEventListener("change", (event) => {
             const pageNumber = parseInt(event.target.value, 10);
             console.log(pageNumber);
-            const cfi = this.state.book.locations.cfiFromLocation(4);
-            console.log(this.state.book.locations.cfiFromLocation(pageNumber))
+            const cfi = this.state.book.locations.cfiFromLocation(pageNumber);
             if (cfi !== -1) {
-                rendition.display(cfi);
+                this.state.rendition.display(cfi);
             } else {
                 console.error("Invalid page number");
             }
