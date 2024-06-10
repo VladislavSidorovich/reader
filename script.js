@@ -166,24 +166,20 @@ App.prototype.doBook = function (url, opts) {
             }
         });
 
-        // Изменение href у ссылки, содержащей текст "1"
-        const changeLinkHref = () => {
+        // Вывод всех найденных ссылок в консоль
+        const logAllLinks = () => {
             const links = document.querySelectorAll("a");
-            let linkFound = false;
-            links.forEach(link => {
-                if (link.textContent.trim() === "1") {
-                    link.href = "https://github.com/VladislavSidorovich/reader/blob/main/script.js";
-                    linkFound = true;
-                    console.log("Link href updated");
-                }
-            });
-            if (!linkFound) {
-                console.error("Link with text '1' not found, retrying...");
-                setTimeout(changeLinkHref, 1000);  // Retry after 1 second
+            if (links.length === 0) {
+                console.error("No links found, retrying...");
+                setTimeout(logAllLinks, 1000);  // Retry after 1 second
+            } else {
+                links.forEach(link => {
+                    console.log("Found link:", link);
+                });
             }
         };
 
-        changeLinkHref();
+        logAllLinks();
 
     }).catch(error => {
         console.error("Failed to load book", error.message);
@@ -795,6 +791,8 @@ App.prototype.onNavigationLoaded = function (nav) {
 
 */
 
+/*
+
 document.getElementById("chapter3-btn").addEventListener("click", function() {
     App.goToChapter("глава 3");
 });
@@ -810,3 +808,5 @@ App.prototype.goToChapter = function(chapterName) {
         }
     }).catch(err => this.fatal("error searching for chapter", err));
 };
+
+*/
