@@ -181,6 +181,13 @@ App.prototype.doOpenBook = function () {
         epubFile = '/1.epub'; // Файл для десктопов
     }
 
+    document.ondragstart = prohibit;//запрещаем перетаскивание
+    document.onselectstart = prohibit;//запрещаем выделение
+    document.oncontextmenu = prohibit;//запрещаем клик правой кнопкой
+    function prohibit() {
+        return false;//предотвращает все эти события
+    }
+
     fetch(epubFile)
         .then(response => {
             if (!response.ok) {
