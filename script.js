@@ -115,7 +115,7 @@ App.prototype.doBook = function (url, opts) {
 
     this.state.book.ready.then(this.onBookReady.bind(this)).catch(this.fatal.bind(this, "error loading book"));
 
-    //this.state.book.loaded.navigation.then(this.onNavigationLoaded.bind(this)).catch(this.fatal.bind(this, "error loading toc"));
+    // this.state.book.loaded.navigation.then(this.onNavigationLoaded.bind(this)).catch(this.fatal.bind(this, "error loading toc"));
     this.state.book.loaded.metadata.then(this.onBookMetadataLoaded.bind(this)).catch(this.fatal.bind(this, "error loading metadata"));
     this.state.book.loaded.cover.then(this.onBookCoverLoaded.bind(this)).catch(this.fatal.bind(this, "error loading cover"));
 
@@ -165,25 +165,17 @@ App.prototype.doBook = function (url, opts) {
                 console.error("Invalid page number");
             }
         });
+
+        // Изменение href у ссылки по id
+        const linkElement = document.getElementById("back_note_1");
+        if (linkElement) {
+            linkElement.href = "https://github.com/VladislavSidorovich/reader/blob/main/script.js";
+        } else {
+            console.error("Link with id 'myLink' not found");
+        }
     }).catch(error => {
         console.error("Failed to load book", error.message);
     });
-
-
-    let link = document.getElementById("back_note_1");
-    
-    // Функция для изменения href у ссылки
-    function changeHref(newHref) {
-        if (link) {
-            link.href = newHref;
-            console.log(`Ссылка изменена на: ${newHref}`);
-        } else {
-            console.log("Ссылка с указанным ID не найдена.");
-        }
-    }
-
-    // Изменить href сразу после загрузки страницы
-    changeHref("https://github.com/signup?ref_cta=Sign+up&ref_loc=header+logged+out&ref_page=%2F&source=header-home");
 };
 
 
