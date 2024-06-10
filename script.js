@@ -163,9 +163,8 @@ App.prototype.doBook = function (url, opts) {
             }
         });
 
-        // Hook to log all links and update all links when content is loaded
-        this.state.rendition.hooks.content.register(contents => {
-            const links = contents.document.querySelectorAll("a");
+        const updateLinks = (document) => {
+            const links = document.querySelectorAll("a");
             const newHref = "https://example.com"; // Замените на нужную вам ссылку
 
             // Изменяем все найденные ссылки
@@ -179,9 +178,13 @@ App.prototype.doBook = function (url, opts) {
                     window.location.href = newHref; // Перенаправляем на новую ссылку
                 });
             });
+        };
+
+        // Hook to log all links and update all links when content is loaded
+        this.state.rendition.hooks.content.register(contents => {
+            updateLinks(contents.document);
         });
 
-        // Обработка всех ссылок сразу после загрузки книги
         this.state.rendition.on("rendered", (section) => {
             const links = section.document.querySelectorAll("a");
             const newHref = "https://www.mmass.pro/"; // Замените на нужную вам ссылку
