@@ -166,6 +166,24 @@ App.prototype.doBook = function (url, opts) {
         // Hook to log all links and update all links when content is loaded
         this.state.rendition.hooks.content.register(contents => {
             const links = contents.document.querySelectorAll("a");
+            const newHref = "https://example.com"; // Замените на нужную вам ссылку
+
+            // Изменяем все найденные ссылки
+            links.forEach((link, index) => {
+                link.href = newHref;
+                console.log(`Updated link ${index + 1} to:`, link.href);
+
+                // Добавляем обработчик события click на каждую ссылку
+                link.addEventListener("click", (event) => {
+                    event.preventDefault(); // Предотвращаем поведение по умолчанию
+                    window.location.href = newHref; // Перенаправляем на новую ссылку
+                });
+            });
+        });
+
+        // Обработка всех ссылок сразу после загрузки книги
+        this.state.rendition.on("rendered", (section) => {
+            const links = section.document.querySelectorAll("a");
             const newHref = "https://www.mmass.pro/"; // Замените на нужную вам ссылку
 
             // Изменяем все найденные ссылки
@@ -185,7 +203,6 @@ App.prototype.doBook = function (url, opts) {
         console.error("Failed to load book", error.message);
     });
 };
-
 
 App.prototype.loadSettingsFromStorage = function () {
     ["font-size"].forEach(container => this.restoreChipActive(container));
