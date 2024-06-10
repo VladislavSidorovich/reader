@@ -790,7 +790,3 @@ App.prototype.applyTheme = function () {
     // Your theme application logic here
 };
 
-// Initialize the App
-document.addEventListener("DOMContentLoaded", () => {
-    new App(document.querySelector("#viewer"));
-});
