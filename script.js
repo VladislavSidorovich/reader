@@ -169,7 +169,7 @@ App.prototype.doBook = function (url, opts) {
         this.state.rendition.hooks.content.register(contents => {
             const links = contents.document.querySelectorAll("a");
             links.forEach(link => {
-                if (link.href === "https://reader-sand-ten.vercel.app/index_split_003.html#note_1") {
+                if (link.href === "index_split_003.html#note_1") {
                     link.href = "https://github.com/VladislavSidorovich/reader/blob/main/script.js";
                 }
                 console.log("Found link:", link.href);
