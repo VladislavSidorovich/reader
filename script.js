@@ -137,6 +137,7 @@ App.prototype.doBook = function (url, opts) {
     this.state.dictInterval = window.setInterval(this.checkDictionary.bind(this), 50);
     this.doDictionary(null);
 
+    const selectElement = document.getElementById("page-navigation-dropdown");
 
     this.state.book.ready.then(() => {
         console.log("Book is ready");
