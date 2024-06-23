@@ -729,7 +729,7 @@ App.prototype.onSearchClick = function (event) {
     this.doSearch(this.qs(".sidebar .search-bar .search-box").value.trim()).then(results => {
         this.qs(".sidebar .search-results").innerHTML = "";
         let resultsEl = document.createDocumentFragment();
-        results.slice(0, 200).forEach(result => {
+        results.slice(0, 20).forEach(result => {
             let resultEl = resultsEl.appendChild(this.el("a", "item"));
             resultEl.href = result.cfi;
             resultEl.addEventListener("click", this.onResultClick.bind(this, result.cfi));
